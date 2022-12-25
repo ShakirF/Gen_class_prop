@@ -1,0 +1,73 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Data" #>
+<#@ assembly name="System.Data.Entity.Design" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Data.SqlClient" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Data.Entity.Design.PluralizationServices" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+namespace Gen_class_prop;
+<#
+string Singularize(string tablename)
+    {
+        var Singular = PluralizationService.CreateService(new System.Globalization.CultureInfo("en-us"));
+
+        return Singular.Singularize(tablename);
+    }
+	string connectionString = @"Server=DESKTOP-DUE6JJJ; Database=Northwind; Trusted_Connection=True;";
+	SqlConnection sqlConnection= new SqlConnection(connectionString);
+	sqlConnection.Open();
+	var sqlTable =  "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG='Northwind'";
+	SqlCommand  command = new SqlCommand(sqlTable,sqlConnection);
+	var tableNames = command.ExecuteReader();
+	while (tableNames.Read())
+    {#>
+public class <#=Singularize(tableNames[0].ToString()).Replace(" ","")#>
+{		 
+			
+		<# var sqlColumn = $@"SELECT CONCAT(
+      'public ',
+      IIF(DATA_TYPE = 'nvarchar', 'string' +         (IIF(IS_NULLABLE = 'YES', '?', '')), ''),
+      IIF(DATA_TYPE = 'uniqueidentifier', 'string' + (IIF(IS_NULLABLE = 'YES', '?', '')), ''),
+      IIF(DATA_TYPE = 'ntext', 'string' +            (IIF(IS_NULLABLE = 'YES', '?', '')), ''),
+      IIF(DATA_TYPE = 'nchar', 'string' +            (IIF(IS_NULLABLE = 'YES', '?', '')), ''),
+      IIF(DATA_TYPE = 'int', 'int' +                 (IIF(IS_NULLABLE = 'YES', '?', '')), ''),
+      IIF(DATA_TYPE = 'smallint', 'short' +          (IIF(IS_NULLABLE = 'YES', '?', '')), ''),
+      IIF(DATA_TYPE = 'tinyint', 'byte' +            (IIF(IS_NULLABLE = 'YES', '?', '')), ''),
+      IIF(DATA_TYPE = 'money', 'decimal' +           (IIF(IS_NULLABLE = 'YES', '?', '')), ''),
+      IIF(DATA_TYPE = 'real', 'decimal' +           (IIF(IS_NULLABLE = 'YES', '?', '')), ''),
+      IIF(DATA_TYPE = 'float', 'float' +             (IIF(IS_NULLABLE = 'YES', '?', '')), ''),
+      IIF(DATA_TYPE = 'decimal', 'decimal' +         (IIF(IS_NULLABLE = 'YES', '?', '')), ''),
+      IIF(DATA_TYPE = 'bit', 'bool' +                (IIF(IS_NULLABLE = 'YES', '?', '')), ''),
+      IIF(DATA_TYPE = 'datetime', 'DateTime' +       (IIF(IS_NULLABLE = 'YES', '?', '')), ''),
+      IIF(DATA_TYPE = 'date', 'DateTime' +           (IIF(IS_NULLABLE = 'YES', '?', '')), ''),
+      IIF(DATA_TYPE = 'datetime2', 'DateTime' +      (IIF(IS_NULLABLE = 'YES', '?', '')), ''),
+      IIF(DATA_TYPE = 'image', 'byte[]' +            (IIF(IS_NULLABLE = 'YES', '?', '')), ''),
+      ' ',
+      COLUMN_NAME,
+      ' {{ get; set; }}' 
+      + (IIF((DATA_TYPE = 'nvarchar' or DATA_TYPE = 'nchar') and (IS_NULLABLE = 'NO'), ' = null!;', ''))
+             )
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = N'{tableNames[0]}'
+      and TABLE_SCHEMA = 'dbo'";
+      
+			SqlConnection sqlConnection2 = new SqlConnection(connectionString);
+			sqlConnection2.Open();
+			SqlCommand  command2 = new SqlCommand(sqlColumn,sqlConnection2); 
+			var columnNames = command2.ExecuteReader();
+		while(columnNames.Read())
+        {#>
+<#=columnNames[0].ToString()#>
+		<#}
+				
+		#>
+				
+}
+	<#}
+	sqlConnection.Close();
+
+#>

@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="Generate_class_prop.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Generate_class_prop.tt</DependentUpon>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HiNetCloud.System.Data.Entity.Design.PluralizationServices" Version="22.12.18.9" />
+    <PackageReference Include="PluralizeService.Core" Version="1.2.21147.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Generate_class_prop.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Generate_class_prop.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Generate_class_prop.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Generate_class_prop.tt</DependentUpon>
+    </Compile>
+    <Compile Update="TextTemplate1.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>TextTemplate1.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+</Project>
